@@ -1,0 +1,22 @@
+{
+  "mode": "train",
+  "device": "auto",
+  "selfies_files": [
+    "data/clean_kras_g12d.selfies.txt"
+  ],
+  "outdir": "models/classic_lm",
+  "epochs": 30,
+  "batch_size": 64,
+  "lr": 0.001,
+  "emb_dim": 128,
+  "hid_dim": 256,
+  "num_layers": 2,
+  "max_len": 120,
+  "grad_clip": 1.0,
+  "save_every": 10,
+  "model_dir": "models/classic_lm",
+  "n_samples": 1000,
+  "out_csv": "data/gen_classic_round1.csv",
+  "temperature": 1.0,
+  "max_trials": 10000
+}
