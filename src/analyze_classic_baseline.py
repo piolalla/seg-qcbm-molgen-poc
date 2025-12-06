@@ -40,7 +40,7 @@ def analyze_block(df, label, topk=None):
     else:
         print(f"[INFO] Rows in this block: {len(df)} (all samples)")
 
-    # 基本唯一性 & 有效性（validity / uniqueness）
+    # （validity / uniqueness）
     if "smiles" in df.columns:
         unique_smiles = df["smiles"].dropna().unique()
         n_unique = len(unique_smiles)

@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-#   prep_kras_g12d.py  -> 得到 data/clean_kras_g12d.csv
-#   并生成 data/expanded_candidates_scored.csv
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${ROOT_DIR}"
+
+if [ -f "/home/sun143/miniconda3/etc/profile.d/conda.sh" ]; then
+  source /home/sun143/miniconda3/etc/profile.d/conda.sh
+  conda activate qsar_env
+fi
 
 TRAIN="${1:-data/clean_kras_g12d.csv}"
 EXPANDED="${2:-data/expanded_candidates_scored.csv}"
@@ -13,7 +19,7 @@ echo "  Train:    ${TRAIN}"
 echo "  Expanded: ${EXPANDED}"
 echo "  Out:      ${OUT}"
 
-python build_rule_based_reward.py \
+python src/build_rule_based_reward.py \
   --train "${TRAIN}" \
   --expanded "${EXPANDED}" \
   --out "${OUT}" \

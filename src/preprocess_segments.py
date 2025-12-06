@@ -10,8 +10,17 @@ Usage:
     --n-segments 3 \
     --out-csv data/clean_kras_g12d_segmented.csv
 """
+import warnings
 from rdkit import RDLogger
+
+# Turn off RDKit warnings
 RDLogger.DisableLog('rdApp.*')
+
+# Turn off Python deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Optional: suppress any RDKit user warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 import argparse
 import numpy as np
 import pandas as pd

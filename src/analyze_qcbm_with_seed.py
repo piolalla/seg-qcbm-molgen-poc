@@ -18,7 +18,17 @@ Usage:
     --scored data/gen_qcbm_segmented_round1_scored.csv \
     --topk 50
 """
+import warnings
+from rdkit import RDLogger
 
+# Turn off RDKit warnings
+RDLogger.DisableLog('rdApp.*')
+
+# Turn off Python deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Optional: suppress any RDKit user warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 import argparse
 import numpy as np
 import pandas as pd
@@ -36,10 +46,12 @@ def describe_series(name, s, prefix=""):
     print(f"{prefix}  count = {len(s)}")
     print(f"{prefix}  mean  = {s.mean():.4f}")
     print(f"{prefix}  std   = {s.std():.4f}")
+    '''
     qs = s.quantile([0.1, 0.25, 0.5, 0.75, 0.9])
     print(f"{prefix}  quantiles:")
     for q, v in qs.items():
         print(f"{prefix}    q{int(q*100):2d} = {v:.4f}")
+    '''
 
 
 def analyze_block(df, label, topk=None):
@@ -49,7 +61,7 @@ def analyze_block(df, label, topk=None):
     else:
         print(f"[INFO] Block size = {len(df)}")
 
-    # 基本唯一性 & 有效性
+    
     if "smiles" in df.columns:
         uniq = df["smiles"].dropna().unique()
         n_unique = len(uniq)
@@ -60,7 +72,7 @@ def analyze_block(df, label, topk=None):
         print("[WARN] No 'smiles' column found.")
 
     print("\n[STATS] Distribution summary:")
-    # 在这里补上 physchem_score / f_physchem
+    
     cols_to_summarize = [
         "reward",
         "QED",
@@ -75,7 +87,7 @@ def analyze_block(df, label, topk=None):
         if col in df.columns:
             describe_series(col, df[col], prefix="  ")
         else:
-            # 对缺少的列简单提示即可
+
             print(f"  {col}: (column not found)")
 
 
@@ -92,20 +104,20 @@ def analyze_seed_level(df):
     seed_idx = df["seed_idx"].astype(int)
     seed_reward = pd.to_numeric(df["seed_reward_qed_mw"], errors="coerce")
 
-    # 使用频率
+
     vc = seed_idx.value_counts().sort_index()
     n_seeds_used = len(vc)
     print(f"[INFO] Number of unique seeds used = {n_seeds_used}")
     print("[INFO] Most frequent seeds (top 10):")
     print(vc.head(10))
 
-    # 种子使用熵 H(seed_idx)
+    #H(seed_idx)
     p = vc / vc.sum()
     entropy = -(p * np.log2(p)).sum()
     max_entropy = np.log2(len(vc)) if len(vc) > 0 else 0.0
     print(f"\n[SEED ENTROPY] = {entropy:.4f} bits (max={max_entropy:.2f})")
 
-    # 每个 seed 的平均 seed_reward_qed_mw
+    # seed_reward_qed_mw
     df_seed = pd.DataFrame({
         "seed_idx": seed_idx,
         "seed_reward_qed_mw": seed_reward
@@ -122,14 +134,14 @@ def analyze_seed_level(df):
     print("\n[SEED CONTRIBUTION TABLE] top 20:")
     print(seed_table.head(20))
 
-    # 相关性：种子 reward vs 使用次数
+  
     if len(seed_table) > 1:
         corr_seed = seed_table["mean_seed_reward"].corr(seed_table["count"])
         print(f"\n[CORRELATION] seed_reward vs seed_usage count = {corr_seed:.4f}")
     else:
         print("\n[CORRELATION] Not enough seeds to compute correlation.")
 
-    # 行级相关性：最终 reward vs seed_reward_qed_mw
+    # reward vs seed_reward_qed_mw
     if "reward" in df.columns:
         df_row = df[["reward", "seed_reward_qed_mw"]].copy()
         df_row = df_row.apply(pd.to_numeric, errors="coerce").dropna()
@@ -160,13 +172,13 @@ def analyze_segment_level(df):
     print("[INFO] Segment usage counts:")
     print(vc)
 
-    # segment 熵 H(segment_id)
+    # segment entropy H(segment_id)
     p = vc / vc.sum()
     entropy = -(p * np.log2(p)).sum()
     max_entropy = np.log2(len(vc)) if len(vc) > 0 else 0.0
     print(f"\n[SEGMENT ENTROPY] = {entropy:.4f} bits (max={max_entropy:.2f})")
 
-    # 每个 segment 的平均 reward / QED / sim / novelty / physchem
+    # segment reward / QED / sim / novelty / physchem
     cols = [
         "reward",
         "QED",
@@ -191,7 +203,7 @@ def analyze_segment_level(df):
     seg_stats = grouped[avail_cols].mean()
     seg_stats["count"] = grouped.size()
 
-    # 方便看，把 count 放前面
+   
     cols_order = ["count"] + avail_cols
     seg_stats = seg_stats[cols_order].sort_values("count", ascending=False)
 
@@ -262,7 +274,7 @@ def main():
     if "reward" not in df.columns:
         raise ValueError("'reward' column not found; cannot rank Top-K.")
 
-    # 全局
+
     analyze_block(df, label="GLOBAL (ALL SAMPLES)")
 
     # Top-K by reward
@@ -270,16 +282,16 @@ def main():
     df_top = df.sort_values("reward", ascending=False).head(topk).reset_index(drop=True)
     analyze_block(df_top, label=f"TOP-{topk} BY REWARD", topk=topk)
 
-    # 种子级分析（如果有）
+
     analyze_seed_level(df)
 
-    # 分段级分析（如果有 segment_id）
+
     analyze_segment_level(df)
 
-    # Global vs Top-K 对比 (novelty_raw / physchem_score / f_physchem)
+    '''
+ 
     compare_global_topk(df, df_top, topk)
 
-    # 最后给一个紧凑视图（方便 eyeball top rows）
     print("\n[TOP-{0}] rows by reward (compact view):".format(topk))
     cols_to_show = [c for c in [
         "smiles",
@@ -297,6 +309,7 @@ def main():
     with pd.option_context("display.max_rows", topk,
                            "display.max_colwidth", 80):
         print(df_top[cols_to_show])
+    '''
 
     print("\n========== DONE ==========")
 

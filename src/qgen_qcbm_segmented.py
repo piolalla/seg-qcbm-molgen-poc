@@ -31,8 +31,17 @@ Usage examples:
       --n-samples 1000
 """
 
+import warnings
 from rdkit import RDLogger
+
+# Turn off RDKit warnings
 RDLogger.DisableLog('rdApp.*')
+
+# Turn off Python deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Optional: suppress any RDKit user warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 import os
 import math
 import argparse
