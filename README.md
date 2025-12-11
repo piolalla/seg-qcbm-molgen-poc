@@ -1,3 +1,28 @@
+# Project Summary
+This repository demonstrates a practical hybrid quantum–classical generative modeling framework for early-stage drug discovery. Instead of attempting full quantum molecular generation—which is currently infeasible with NISQ hardware—we propose a segmented Quantum Circuit Born Machine (QCBM) that acts as a learned probabilistic prior, guiding a SELFIES-based LSTM to generate chemically valid and biologically relevant molecules.
+
+- Quantum generative models are often criticized for lacking real-world impact due to limited circuit sizes.
+- Our approach shows that even small-qubit QCBMs can meaningfully bias chemical exploration when used as priors instead of full generators.
+- This establishes a realistic, near-term application of QML to molecular discovery—aligning with trends shown in recent quantum-aided drug design work.
+
+## Key Findings
+Across 1000 generated molecules per model:
+- Target relevance improved significantly
+    QCBM-based models increased top-50 KRAS G12D similarity from 0.31 → 0.51.
+- Better multi-objective optimization
+    Segmented QCBM boosted global QED to 0.53, outperforming classical LSTM.
+- Controlled chemical space exploration
+    QCBM models lower novelty (trade-off), but yield higher-value drug-like candidates.
+- Segmentation helps quantum modeling
+    Splitting molecular space into clusters produces:
+    - better physicochemical control
+    - better sampling efficiency
+    - higher drug-likeness
+
+Quantum models shine not as full generators, but as structured priors that steer classical models toward high-quality regions of chemical space.
+This PoC demonstrates how quantum-guided chemical generation is already feasible, even with today's hardware constraints.
+
+
 # Quantum–Classical Molecular Generation Pipeline
 
 This repository provides three molecular generation pipelines:
