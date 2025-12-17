@@ -5,7 +5,6 @@ This repository demonstrates a practical hybrid quantum–classical generative m
 - Our approach shows that even small-qubit QCBMs can meaningfully bias chemical exploration when used as priors instead of full generators.
 - This establishes a realistic, near-term application of QML to molecular discovery—aligning with trends shown in recent quantum-aided drug design work.
 
-## Key Findings
 Across 1000 generated molecules per model:
 - Target relevance improved significantly
     QCBM-based models increased top-50 KRAS G12D similarity from 0.31 → 0.51.
@@ -22,6 +21,7 @@ Across 1000 generated molecules per model:
 Quantum models shine not as full generators, but as structured priors that steer classical models toward high-quality regions of chemical space.
 This PoC demonstrates how quantum-guided chemical generation is already feasible, even with today's hardware constraints.
 
+---
 
 # Quantum–Classical Molecular Generation Pipeline
 
